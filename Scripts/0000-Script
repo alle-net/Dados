@@ -1,0 +1,8 @@
+let
+    Import = 
+        let
+            e1 = List.Dates(#date(2024,01,01),10, #duration(1,0,0,0))
+        in
+            e1
+in
+    Import
