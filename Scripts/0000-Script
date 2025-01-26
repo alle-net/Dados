@@ -3,8 +3,6 @@ let
         let
             e1 = 
             [
-                dataInicial = dataInicial,
-                dataFinal = dataFinal,
                 Binary.ApproximateLength = Binary.ApproximateLength, 
                 Binary.Buffer = Binary.Buffer, 
                 Binary.Combine = Binary.Combine, 
