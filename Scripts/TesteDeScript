@@ -1,0 +1,19 @@
+let 
+  Import = 
+        let 
+          e1 = #table(
+            type table 
+            [
+              id = Int64.Type, 
+              descricao = text
+            ], 
+            {
+              {1, "BRA"},
+              {2,"USA"},
+              {3,"ARG"}
+            }
+          ) 
+          in 
+            e1 
+        in 
+          Import
