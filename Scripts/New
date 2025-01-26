@@ -1,1 +1,11 @@
-let Import = let e1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} in e1 in Import
+let
+    Import =
+        let
+            e1 = #table(
+                type table [id = Int16.Type, regiao = text],
+                {{1, "Norte"}, {2, "Nordeste"}, {3, "Centro-Oeste"}, {4, "Sudeste"}, {5, "Sul"}}
+            )
+        in
+            e1
+in
+    Import
