@@ -1,0 +1,105 @@
+let
+    Import = 
+        let
+            e1 = #table(
+                type table[Regiao =text,Estado = text, UF = text, Cliente = Int64.Type, Nome = text, Cidade = text, Latitude = number, Longitude = number, Sexo = text],
+                {
+                    {"NORDESTE","SERGIPE","SE",280030,"DRA. BRUNA DA CRUZ","ARACAJU",-10.91,-37.07,"F"},
+                    {"SUDESTE","ESPIRITO SANTO","ES",320530,"BEATRIZ BORGES","VITORIA",-20.31,-40.33,"F"},
+                    {"SUL","PARANA","PR",410690,"ISIS NOVAIS","CURITIBA",-25.42,-49.27,"F"},
+                    {"NORTE","AMAZONAS","AM",130260,"SRA. MARIA ISIS NOGUEIRA","MANAUS",-3.1,-60.02,"F"},
+                    {"NORTE","PARA","PA",150140,"HADASSA MACEDO","BELEM",-1.45,-48.5,"F"},
+                    {"NORDESTE","MARANHAO","MA",211130,"MILENA NASCIMENTO","SAO LUIS",-2.52,-44.3,"F"},
+                    {"NORDESTE","CEARA","CE",230440,"DRA. BEATRIZ GONCALVES","FORTALEZA",-3.71,-38.54,"F"},
+                    {"NORDESTE","BAHIA","BA",292740,"LAIS DA COSTA","SALVADOR",-12.97,-38.51,"F"},
+                    {"SUDESTE","MINAS GERAIS","MG",310620,"BIANCA ROCHA","BELO HORIZONTE",-19.81,-43.95,"F"},
+                    {"CENTRO-OESTE","GOIAS","GO",520870,"SRA. MARIA ALICE SIQUEIRA","GOIANIA",-16.67,-49.25,"F"},
+                    {"NORTE","ACRE","AC",120040,"VINICIUS AZEVEDO","RIO BRANCO",-9.97,-67.8,"M"},
+                    {"NORTE","RORAIMA","RR",140010,"AUGUSTO CASA GRANDE","BOA VISTA",2.81,-60.67,"M"},
+                    {"NORTE","AMAPA","AP",160030,"RENAN FARIAS","MACAPA",0.03,-51.06,"M"},
+                    {"NORTE","TOCANTINS","TO",172100,"GABRIEL DA MOTA","PALMAS",-10.16,-48.33,"M"},
+                    {"NORDESTE","RIO GRANDE DO NORTE","RN",240810,"GUSTAVO LIMA","NATAL",-5.79,-35.2,"M"},
+                    {"NORDESTE","ALAGOAS","AL",270430,"JOAO MIGUEL CARDOSO","MACEIO",-9.66,-35.73,"M"},
+                    {"SUDESTE","SAO PAULO","SP",355030,"LUIZ OTAVIO DA PAZ","SAO PAULO",-23.54,-46.63,"M"},
+                    {"SUL","RIO GRANDE DO SUL","RS",431490,"SR. EDUARDO PIRES","PORTO ALEGRE",-30.03,-51.22,"M"},
+                    {"NORTE","RONDONIA","RO",110020,"JOAO VITOR ANDRADE","PORTO VELHO",-8.76,-63.9,"M"},
+                    {"NORDESTE","PIAUI","PI",221100,"GUILHERME NOVAES","TERESINA",-5.08,-42.8,"M"},
+                    {"NORDESTE","PARAIBA","PB",250750,"SR. DAVI MIGUEL CUNHA","JOAO PESSOA",-7.11,-34.86,"M"},
+                    {"NORDESTE","PERNAMBUCO","PE",261160,"THIAGO COSTELA","RECIFE",-8.05,-34.88,"M"},
+                    {"SUDESTE","RIO DE JANEIRO","RJ",330455,"ANTONY DA ROSA","RIO DE JANEIRO",-22.9,-43.2,"M"},
+                    {"SUL","SANTA CATARINA","SC",420540,"JOAO MIGUEL DAS NEVES","FLORIANOPOLIS",-27.59,-48.54,"M"},
+                    {"CENTRO-OESTE","MATO GROSSO DO SUL","MS",500270,"BENICIO LEAO","CAMPO GRANDE",-20.44,-54.64,"M"},
+                    {"CENTRO-OESTE","MATO GROSSO","MT",510340,"ARTHUR MIGUEL RODRIGUES","CUIABA",-15.59,-56.09,"M"},
+                    {"CENTRO-OESTE","DISTRITO FEDERAL","DF",530010,"BENICIO MENDES","BRASILIA",-15.77,-47.93,"M"}
+                }
+
+
+            ),
+            e2 = {"PARDA","PARDA","PARDA","PARDA","PARDA","PARDA","PARDA","PARDA","PARDA","BRANCA","BRANCA","BRANCA","BRANCA","BRANCA","NEGRA","NEGRA","NEGRA","NEGRA","NEGRA","INDIGENA", "INDIGENA", "AMARELA"},
+            e3 = Table.AddColumn(e1,"CorDaPele", each e2{Number.RoundDown(Number.RandomBetween(0,List.Count(e2)))}, type text),
+            e4 = Table.AddColumn(e3,"FaixaEtaria", each 
+                let 
+                    Data = Date.From(DateTimeZone.LocalNow()),
+                    Dias = Date.AddDays(Data, Number.Round(Number.RandomBetween(-31,0))),
+                    Meses = Date.AddMonths(Dias, Number.Round(Number.RandomBetween(-12,0))),
+                    Aniv = Date.AddYears(Meses,Number.Round(Number.RandomBetween(-70,-18))),
+                    Dif = Duration.Days(Data - Aniv) + 1,
+                    Idade = Number.RoundDown(Value.Divide(Dif,365)),
+
+                    Faixas = 
+                        let
+                            Condicoes = 
+                                {
+                                    Idade <= 21,
+                                    Idade > 21 and Idade <= 25,
+                                    Idade > 25 and Idade <= 30,
+                                    Idade > 30 and Idade <= 40,
+                                    Idade > 40 and Idade <= 50,
+                                    Idade > 50 and Idade <= 60,
+                                    Idade > 60
+                                },
+                            Resultados = 
+                                {
+                                    "18 - 25 ANOS",
+                                    "21 - 25 ANOS",
+                                    "26 - 30 ANOS",
+                                    "31 - 40 ANOS",
+                                    "41 - 50 ANOS",
+                                    "50 - 60 ANOS",
+                                    "MAIS DE 60 ANOS"
+                                }
+                        in
+                            Resultados{List.PositionOf(Condicoes,true)}
+                in
+                    Faixas, type text
+            ),
+            e5 = Table.AddColumn(e4,"Renda", each 
+                let 
+                    Salarios = Number.RoundDown(Number.RandomBetween(0,10)),
+                    Faixas = 
+                        let
+                            Condicoes = 
+                                {
+                                    Salarios < 1,
+                                    Salarios >=1 and Salarios < 3,
+                                    Salarios >= 3 and Salarios < 5,
+                                    Salarios >= 5 and Salarios < 10,
+                                    Salarios >= 10
+                                },
+                            Resultados = 
+                                {
+                                    " MENOS de 1 SALARIO",
+                                    "ENTRE 1 e 2 SALARIOS",
+                                    "ENTRE 3 e 4 SALARIOS",
+                                    "ENTRE 5 E 9 SALARIOS",
+                                    "MAIS DE 10 SALARIOS"
+                                }
+                        in
+                            Resultados{List.PositionOf(Condicoes,true)}
+                in
+                    Faixas, type text
+            )
+        in
+            e5
+in
+    Import
