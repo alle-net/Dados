@@ -5642,8 +5642,9 @@ let
                             Resultados{List.PositionOf(Condicoes,true)}
                 in
                     Faixas, type text
-            )
+            ),
+            e6 = Table.AddIndexColumn(e5,"Seq",1,1, Int64.Type)
         in
-            e5
+            e6
 in
     Import
