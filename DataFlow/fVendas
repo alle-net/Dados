@@ -24,7 +24,7 @@ let
                     Status,
 
             //Lista de Clientes
-            ListaDeClientes =  List.Buffer({1..5570}),
+            ListaDeClientes =  List.Buffer({110001..115570}),
             //Adiciona a coluna clientes
             AdicionaColunaClientes = Table.AddColumn(
                 AdicionaColunaStatus,
