@@ -1,1 +1,57 @@
+let
+    Fonte = 
+        let 
+            e1 = SharePoint.Contents("https://anallysis.sharepoint.com/sites/Exemplos-Exemplos", [ApiVersion = 15]),
+            e2 = Table.Combine(Table.SelectRows(e1, each ([Name] = "Shared Documents"))[Content]),
+            e3 = Table.Combine(Table.SelectRows(e2, each ([Name] = "Exemplos"))[Content]),
+            e4 = Table.Combine(Table.SelectRows(e3, each ([Name] = "PrimeCursos"))[Content]),
+            e5 = Table.Combine(Table.SelectRows(e4, each ([Name] = "Dax Avancado"))[Content]),
+            e6 = Table.Combine(Table.SelectRows(e5, each ([Name] = "Bases"))[Content]),
+            e7 = Table.Combine(Table.SelectRows(e6, each ([Name] = "Fatos"))[Content]),
+            e8 = Table.TransformColumns(e7,{"Content", each Parquet.Document(_)}),
+            e9 = Table.TransformColumns(
+                e8,
+                    {
+                        "Content", each Table.RenameColumns(_,
+                            {
+                                {"0", "DataVenda"},
+                                {"1", "DataEntrega"},
+                                {"2", "IdCanal"},
+                                {"3","IdCliente"},
+                                {"4","IdPedido"},
+                                {"5","IdProduto"},
+                                {"6","Qtde"},
+                                {"7", "ValorTotal"}
+                            }
+                        )
+                    }
+            ),
+            e10 = Table.TransformColumns(
+                e9,
+                    {
+                        {
+                            "Content", each Table.TransformColumns(_,
+                                {
+                                    {"DataVenda", each try Date.From(_) otherwise null, type date},
+                                    {"DataEntrega", each try Date.From(_) otherwise null, type date},
+                                    {"IdCanal", each try Int64.From(_) otherwise null, Int64.Type},
+                                    {"IdCliente", each try Int64.From(_) otherwise null, Int64.Type},
+                                    {"IdPedido", each try Int64.From(_) otherwise null, Int64.Type},
+                                    {"IdProduto", each try Int64.From(_) otherwise null, Int64.Type},
+                                    {"Qtde", each try Int64.From(_) otherwise null, Int64.Type},
+                                    {"ValorTotal", each try Currency.From(_) otherwise null, Currency.Type }
 
+                                }
+                            )
+                        }
+                    }
+            ),
+            e11 = Table.TransformColumns(
+                e10,
+                    {"Content", each Table.SelectRows(_, each  [IdPedido] <> null)}
+            ),
+            e12 = Table.Combine(e11[Content])
+        in
+            e12
+in
+    Fonte
