@@ -1,1 +1,42 @@
-
+let
+    Fonte = 
+        let 
+            e1 = SharePoint.Contents("https://anallysis.sharepoint.com/sites/Exemplos-Exemplos", [ApiVersion = 15]),
+            e2 = Table.Combine(Table.SelectRows(e1, each ([Name] = "Shared Documents"))[Content]),
+            e3 = Table.Combine(Table.SelectRows(e2, each ([Name] = "Exemplos"))[Content]),
+            e4 = Table.Combine(Table.SelectRows(e3, each ([Name] = "PrimeCursos"))[Content]),
+            e5 = Table.Combine(Table.SelectRows(e4, each ([Name] = "Dax Avancado"))[Content]),
+            e6 = Table.Combine(Table.SelectRows(e5, each ([Name] = "Bases"))[Content]),
+            e7 = Table.Combine(Table.SelectRows(e6, each ([Name] = "Dimensoes"))[Content]),
+            e8 = Table.TransformColumns(e7,{"Content", each Parquet.Document(_)}),
+            
+            e9 = e8{[Name="Clientes.parquet"]}[Content],
+            e10 = Table.RenameColumns(e9,
+                {
+                    {"ID_Cliente", "IdCliente"},
+                    {"Primeiro Nome", "PrimeiroNome"},
+                    {"Sobrenome", "SobreNome"},
+                    {"Data Nascimento", "DataNascimento"},
+                    {"Estado Civil", "EstadoCivil"},
+                    {"Gênero","Genero"},
+                    {"Educação","Educacao"},
+                    {"ID_Cidade", "IdCidade"}
+                }
+            ),
+            e11 = Table.TransformColumns(
+                e10,
+                    {
+                        {"IdCliente", each Int64.From(_), Int64.Type},
+                        {"PrimeiroNome", each Text.From(_), type text},
+                        {"SobreNome", each Text.From(_), type text},
+                        {"DataNascimento", each Date.From(_), type date},
+                        {"EstadoCivil", each Text.From(_), type text},
+                        {"Genero", each Text.From(_), type text},
+                        {"Educacao", each Text.From(_), type text},
+                        {"IdCidade", each Int64.From(_), Int64.Type}
+                    }
+            )
+        in
+            e11
+in
+    Fonte
