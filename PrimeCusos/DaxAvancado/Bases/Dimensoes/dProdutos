@@ -1,0 +1,41 @@
+let
+    Fonte = 
+        let 
+            e1 = SharePoint.Contents("https://anallysis.sharepoint.com/sites/Exemplos-Exemplos", [ApiVersion = 15]),
+            e2 = Table.Combine(Table.SelectRows(e1, each ([Name] = "Shared Documents"))[Content]),
+            e3 = Table.Combine(Table.SelectRows(e2, each ([Name] = "Exemplos"))[Content]),
+            e4 = Table.Combine(Table.SelectRows(e3, each ([Name] = "PrimeCursos"))[Content]),
+            e5 = Table.Combine(Table.SelectRows(e4, each ([Name] = "Dax Avancado"))[Content]),
+            e6 = Table.Combine(Table.SelectRows(e5, each ([Name] = "Bases"))[Content]),
+            e7 = Table.Combine(Table.SelectRows(e6, each ([Name] = "Dimensoes"))[Content]),
+            e8 = Table.TransformColumns(e7,{"Content", each Parquet.Document(_)}),
+            
+            e9 = e8{[Name="Produto.parquet"]}[Content],
+            e10 = Table.RenameColumns(e9,
+                {
+                    {"ID_Subcategoria", "IdSubCategoria"},
+                    {"ID_Produto", "IdProduto"},
+                    {"Descricao_Produto", "DescricaoProduto"},
+                    {"ID_Marca","IdMarca"},
+                    {"Preco_Unitario", "PrecoUnitario"},
+                    {"Tributos", "Tributos"},
+                    {"Custo", "Custos"}
+                }
+            ),
+            e11 = Table.TransformColumns(
+                e10,
+                    {
+                        {"IdSubCategoria", each Int64.From(_), Int64.Type},
+                        {"IdProduto", each Int64.From(_), Int64.Type},
+                        {"DescricaoProduto", each Text.From(_), type text},
+                        {"IdMarca", each Int64.From(_), Int64.Type},
+                        {"PrecoUnitario", each Currency.From(_), Currency.Type},
+                        {"Tributos", each Currency.From(_), Currency.Type},
+                        {"Custos", each Currency.From(_), Currency.Type}
+
+                    }
+            )
+        in
+            e11
+in
+    Fonte
