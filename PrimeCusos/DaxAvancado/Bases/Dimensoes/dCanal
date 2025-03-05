@@ -24,8 +24,7 @@ let
                         {"DescricaoCanal", each Text.From(_), type text}
 
                     }
-            ),
-            e12 = Table.SelectRows(e11, each [IdCanal] = 1)
+            )
         in
             e12
 in
